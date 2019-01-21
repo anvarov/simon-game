@@ -9,6 +9,7 @@
     "serve": "parcel index.html"
   },
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
     "@babel/preset-react": "^7.0.0",
     "normalize.css": "^8.0.1",
     "react": "^16.7.0",
