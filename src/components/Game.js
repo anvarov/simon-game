@@ -9,7 +9,7 @@ const sound1 = new Audio(require("../sounds/1.ogg")),
   sound3 = new Audio(require("../sounds/3.ogg")),
   sound4 = new Audio(require("../sounds/3.ogg"));
 
-const COLORS = ["red", "blue", "green", "yellow"];
+const COLORS = ["red", "blue", "yellow", "green"];
 const playSound = clickedButton => {
   switch (clickedButton) {
     case "red":
@@ -50,6 +50,7 @@ class Game extends Component {
   };
 
   onClick = e => {
+    if (!this.props.game.gameStarted || this.props.game.gameEnded) return false
     const clickedButton = e.target.id;
     clickedButton && playSound(clickedButton);
     e.target.className = "clicked";
@@ -79,8 +80,9 @@ class Game extends Component {
 
   componentDidUpdate() {
     //right after game start
-    let clickedButton = COLORS[Math.floor(Math.random() * 3)];
+    let clickedButton = COLORS[Math.floor(Math.random() * 4)];
     if (this.props.game.gameStarted && this.props.game.sequence.length === 0) {
+      console.log('from 1st conditional')
       setTimeout(
         ctx => {
           playSound(clickedButton);
@@ -100,6 +102,7 @@ class Game extends Component {
       this.props.game.playerMoves === 0 &&
       this.props.game.sequence.length > this.props.game.computerMoves
     ) {
+      console.log('from 2nd conditional')
       setTimeout(
         ctx => {
           clickedButton = ctx.props.game.sequence[ctx.props.game.computerMoves];
@@ -120,11 +123,9 @@ class Game extends Component {
       this.props.game.playerMoves === 0 &&
       this.props.game.sequence.length === this.props.game.computerMoves &&
       this.props.game.level !== 1 &&
-      this.props.game.sequence.length <= this.props.game.level
+      this.props.game.sequence.length < this.props.game.level
     ) {
-      // console.log(clickedButton, "from cdu");
-      console.log(this.props.game.sequence);
-
+      console.log('from 3th conditional')
       setTimeout(
         ctx => {
           clickedButton = COLORS[Math.floor(Math.random() * 3)];
@@ -133,7 +134,6 @@ class Game extends Component {
               ? (element.className = "clicked")
               : (element.className = "");
           });
-          console.log("from timer");
           playSound(clickedButton);
           ctx.props.dispatch(makeMove(clickedButton, true, true));
         },
@@ -164,6 +164,7 @@ class Game extends Component {
               Start game
             </button>
             <p>{this.props.game.score}</p>
+            <p>{this.props.game.level}</p>
           </div>
         </div>
       </div>
