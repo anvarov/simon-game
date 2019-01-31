@@ -1,53 +1,72 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import {
-  addScore,
-  startGame,
-  endGame,
-  levelUp,
-  makeMove
-} from "../actions/game";
+import { levelUp, startGame, endGame, makeMove } from "../actions/game";
 import "../styles/normalize.css";
 import "../styles/styles.scss";
 
+const sound1 = new Audio(require("../sounds/1.ogg")),
+  sound2 = new Audio(require("../sounds/2.ogg")),
+  sound3 = new Audio(require("../sounds/3.ogg")),
+  sound4 = new Audio(require("../sounds/3.ogg"));
+
 const COLORS = ["red", "blue", "green", "yellow"];
+const playSound = clickedButton => {
+  switch (clickedButton) {
+    case "red":
+      sound1.play();
+      break;
+    case "yellow":
+      sound2.play();
+      break;
+    case "green":
+      sound3.play();
+      break;
+    case "blue":
+      sound4.play();
+      break;
+    default:
+      break;
+  }
+};
 
 class Game extends Component {
   constructor(props) {
     super(props);
     this.startGame = this.startGame.bind(this);
-    this.clickButton = this.clickButton.bind(this);
+    this.onClick = this.onClick.bind(this);
     this.containerRef = React.createRef();
     this.clearClass = this.clearClass.bind(this);
   }
 
   clearClass = () => {
     const children = this.containerRef.current.childNodes;
-    children.forEach(element => {
-      element.className = "";
-    });
+    for (let index = 0; index < 5; index++) {
+      children[index].className = "";
+    }
   };
 
   startGame = () => {
     this.props.dispatch(startGame);
   };
 
-  clickButton = e => {
+  onClick = e => {
+    const clickedButton = e.target.id;
+    clickedButton && playSound(clickedButton);
     e.target.className = "clicked";
     if (
-      this.props.game.sequence[this.props.game.moves - 1] === e.target.id &&
-      this.props.game.sequence.length === this.props.game.moves
+      this.props.game.gameStarted &&
+      this.props.game.playerMoves + 1 < this.props.game.sequence.length
     ) {
-      this.props.dispatch(makeMove(e, false, true, true));
-      
+      clickedButton === this.props.game.sequence[this.props.game.playerMoves]
+        ? this.props.dispatch(makeMove(clickedButton, false))
+        : this.props.dispatch(endGame);
     } else if (
-      this.props.game.sequence[this.props.game.moves - 1] === e.target.id
+      this.props.game.gameStarted &&
+      this.props.game.sequence.length === this.props.game.playerMoves + 1
     ) {
-      this.props.dispatch(makeMove(e));
-    } else if (
-      this.props.game.sequence[this.props.game.moves - 1] !== e.target.id
-    ) {
-      this.props.dispatch(endGame);
+      clickedButton === this.props.game.sequence[this.props.game.playerMoves]
+        ? this.props.dispatch(levelUp)
+        : this.props.dispatch(endGame);
     }
   };
 
@@ -59,19 +78,69 @@ class Game extends Component {
   }
 
   componentDidUpdate() {
-    if (
+    //right after game start
+    let clickedButton = COLORS[Math.floor(Math.random() * 3)];
+    if (this.props.game.gameStarted && this.props.game.sequence.length === 0) {
+      setTimeout(
+        ctx => {
+          playSound(clickedButton);
+          ctx.containerRef.current.childNodes.forEach(element => {
+            element.id === clickedButton
+              ? (element.className = "clicked")
+              : (element.className = "");
+          });
+          ctx.props.dispatch(makeMove(clickedButton, true, true));
+        },
+        1200,
+        this
+      );
+      return;
+    } else if (
       this.props.game.gameStarted &&
-      // this.props.game.moves === this.props.game.sequence.length &&
-      this.props.game.sequence.length < this.props.game.level
+      this.props.game.playerMoves === 0 &&
+      this.props.game.sequence.length > this.props.game.computerMoves
     ) {
-			let clickedButton = COLORS[Math.floor(Math.random() * 3)];
-			console.log(clickedButton)
-      this.containerRef.current.childNodes.forEach(element => {
-        element.id === clickedButton
-          ? (element.className = "clicked")
-          : (element.className = "");
-      });
-      this.props.dispatch(makeMove(clickedButton, true));
+      setTimeout(
+        ctx => {
+          clickedButton = ctx.props.game.sequence[ctx.props.game.computerMoves];
+          playSound(clickedButton);
+          ctx.containerRef.current.childNodes.forEach(element => {
+            element.id === clickedButton
+              ? (element.className = "clicked")
+              : (element.className = "");
+          });
+          ctx.props.dispatch(makeMove(clickedButton, true));
+        },
+        1200,
+        this
+      );
+      return;
+    } else if (
+      this.props.game.gameStarted &&
+      this.props.game.playerMoves === 0 &&
+      this.props.game.sequence.length === this.props.game.computerMoves &&
+      this.props.game.level !== 1 &&
+      this.props.game.sequence.length <= this.props.game.level
+    ) {
+      // console.log(clickedButton, "from cdu");
+      console.log(this.props.game.sequence);
+
+      setTimeout(
+        ctx => {
+          clickedButton = COLORS[Math.floor(Math.random() * 3)];
+          ctx.containerRef.current.childNodes.forEach(element => {
+            element.id === clickedButton
+              ? (element.className = "clicked")
+              : (element.className = "");
+          });
+          console.log("from timer");
+          playSound(clickedButton);
+          ctx.props.dispatch(makeMove(clickedButton, true, true));
+        },
+        1200,
+        this
+      );
+      return;
     }
   }
   componentWillUnmount() {
@@ -85,10 +154,11 @@ class Game extends Component {
     return (
       <div>
         <div className="container" ref={this.containerRef}>
-          <div id="red" onClick={this.clickButton} />
-          <div id="yellow" onClick={this.clickButton}/>
-          <div id="blue" onClick={this.clickButton}/>
-          <div id="green" onClick={this.clickButton}/>
+          <audio src={sound1} id="sound1" />
+          <div id="red" onClick={this.onClick} />
+          <div id="yellow" onClick={this.onClick} />
+          <div id="blue" onClick={this.onClick} />
+          <div id="green" onClick={this.onClick} />
           <div id="menu">
             <button id="startGame" onClick={this.startGame}>
               Start game

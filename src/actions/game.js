@@ -6,22 +6,21 @@ export const startGame = {
   type: "START_GAME"
 };
 
-export const makeMove = (
-  e,
-  isComputer = false,
-  levelUp = false,
-  addScore = false,
-  addMove = false
-) => {
+export const levelUp = {
+  type: "LEVEL_UP"
+};
+//makeMove universal function, it can return different type of action by passing different
+//arguments
+export const makeMove = (e, isComputer = false, isUpdate = false) => {
   let clickedButton;
-  !isComputer ? (clickedButton = e.target.id) : (clickedButton = e);
+  typeof e !== "undefined" && e.hasOwnProperty("id")
+    ? (clickedButton = e.target.id)
+    : (clickedButton = e);
   return {
     type: "MAKE_MOVE",
     clickedButton,
     isComputer,
-    levelUp,
-		addScore,
-		addMove
+    isUpdate
   };
 };
 

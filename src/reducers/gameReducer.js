@@ -5,40 +5,43 @@ const gameDefaultState = {
   gameEnded: false,
   sequence: [],
   level: 0,
-  moves: 0,
-  score: 0
+  computerMoves: 0,
+  playerMoves: 0,
+  score: 0,
+  isUpdate: false,
 };
 
 export default (state = gameDefaultState, action) => {
   switch (action.type) {
     case "START_GAME":
       return {
-        ...state,
+        ...gameDefaultState,
         gameStarted: true,
-        gameEnded: false,
         level: 1
       };
     case "END_GAME":
       return {
-        ...state,
-        gameStarted: false,
-        gameEnded: true,
-        level: 0,
-        score: 0,
-        sequence: []
+        ...gameDefaultState,
+        gameEnded: true
       };
     case "MAKE_MOVE":
-      console.log(action);
       return {
         ...state,
-        sequence: action.isComputer
+        sequence: action.isUpdate
           ? update(state.sequence, { $push: [action.clickedButton] })
           : state.sequence,
-        moves: action.addMove ? state.moves + 1 : state.moves,
-        level: action.levelUp ? state.level + 1 : state.level,
-        score: action.addScore ? state.level * 1.25 + state.score : state.score
+        playerMoves: action.isComputer  ? 0 : state.playerMoves + 1, 
+        computerMoves: action.isComputer ? state.computerMoves + 1 : 0
       };
-
+    case 'LEVEL_UP':
+      return {
+        ...state,
+        playerMoves: 0,
+        computerMoves: 0,
+        score: state.level * 1.25 + state.score,
+        level: state.level + 1
+      }
+   
     default:
       return state;
   }
