@@ -1,28 +1,33 @@
-export const transitionEnded = {
-  type: "TRANSITION_ENDED"
+export const endGame = {
+  type: "END_GAME"
 };
 
-export const setPlayerTurn = move => {
+export const startGame = {
+  type: "START_GAME"
+};
+
+export const makeMove = (
+  e,
+  isComputer = false,
+  levelUp = false,
+  addScore = false,
+  addMove = false
+) => {
+  let clickedButton;
+  !isComputer ? (clickedButton = e.target.id) : (clickedButton = e);
   return {
-    type: "SET_PLAYER_TURN",
-    action: move
+    type: "MAKE_MOVE",
+    clickedButton,
+    isComputer,
+    levelUp,
+		addScore,
+		addMove
   };
 };
 
-export const buttonClicked = (e) => {
-	return {
-		type: "BUTTON_CLICKED",
-		move: e.target.id
-	}
-}
-
-export const computerClick = () => {
-  return {
-    type: "COMPUTER_CLICK",
-    
-  }
-}
-
-export const playerClick = () => {
-  
-}
+// export const playerMove = (e) => {
+// const clickedButton = e.target.id
+// return {
+// type:
+// }
+// }

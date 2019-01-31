@@ -1,105 +1,112 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import {
+  addScore,
+  startGame,
+  endGame,
+  levelUp,
+  makeMove
+} from "../actions/game";
+import "../styles/normalize.css";
 import "../styles/styles.scss";
-import { transitionEnded, setPlayerTurn, buttonClicked, computerClick } from "../actions/game";
+
+const COLORS = ["red", "blue", "green", "yellow"];
 
 class Game extends Component {
   constructor(props) {
     super(props);
+    this.startGame = this.startGame.bind(this);
+    this.clickButton = this.clickButton.bind(this);
     this.containerRef = React.createRef();
-    this.transitionEnded = () => {
-      this.props.dispatch(transitionEnded);
-    };
-    // this.computerPicker = container => {
-    //   if (
-    //     this.props.game.computerTurns < this.props.game.round ||
-    //     this.props.game.computerTurns === this.props.game.playerTurns
-    //   ) {
-    //     const randomPick = Math.floor(Math.random() * 3);
-    //     container.childNodes[randomPick].click();
-    //   }
-    // };
-    this.onClick = e => {
-      if (this.props.game.computerTurns < this.props.game.playerTurns) {
-        return false;
-      }
-      e.persist();
-      this.props.dispatch(buttonClicked(e));
-    };
-
-    this.transitionEnded = this.transitionEnded.bind(this);
-    this.onClick = this.onClick.bind(this);
-    this.computerPicker = this.computerPicker.bind(this);
+    this.clearClass = this.clearClass.bind(this);
   }
+
+  clearClass = () => {
+    const children = this.containerRef.current.childNodes;
+    children.forEach(element => {
+      element.className = "";
+    });
+  };
+
+  startGame = () => {
+    this.props.dispatch(startGame);
+  };
+
+  clickButton = e => {
+    e.target.className = "clicked";
+    if (
+      this.props.game.sequence[this.props.game.moves - 1] === e.target.id &&
+      this.props.game.sequence.length === this.props.game.moves
+    ) {
+      this.props.dispatch(makeMove(e, false, true, true));
+      
+    } else if (
+      this.props.game.sequence[this.props.game.moves - 1] === e.target.id
+    ) {
+      this.props.dispatch(makeMove(e));
+    } else if (
+      this.props.game.sequence[this.props.game.moves - 1] !== e.target.id
+    ) {
+      this.props.dispatch(endGame);
+    }
+  };
 
   componentDidMount() {
-    const container = this.containerRef.current;
-    if (this.props.game.round === 0){
-      this.props.dispatch(computerClick)
-    }
-    container.addEventListener("transitionend", this.transitionEnded);
-    // window.addEventListener("load", this.computerPicker(container));
+    this.containerRef.current.addEventListener(
+      "transitionend",
+      this.clearClass
+    );
   }
 
-  componentWillUnmount() {
-    const container = this.containerRef.current;
-    container.removeEventListener("transitionend", this.transitionEnded);
-    // window.removeEventListener("load", this.computerPicker(container));
+  componentDidUpdate() {
+    if (
+      this.props.game.gameStarted &&
+      // this.props.game.moves === this.props.game.sequence.length &&
+      this.props.game.sequence.length < this.props.game.level
+    ) {
+			let clickedButton = COLORS[Math.floor(Math.random() * 3)];
+			console.log(clickedButton)
+      this.containerRef.current.childNodes.forEach(element => {
+        element.id === clickedButton
+          ? (element.className = "clicked")
+          : (element.className = "");
+      });
+      this.props.dispatch(makeMove(clickedButton, true));
+    }
   }
+  componentWillUnmount() {
+    this.containerRef.current.removeEventListener(
+      "transitionend",
+      this.clearClass
+    );
+  }
+
   render() {
     return (
-      <div className="container" ref={this.containerRef}>
-        <div
-          id="red"
-          onClick={this.onClick}
-          className={
-            !this.props.game.isTransitionEnded &&
-            this.props.game.buttonClicked === "red"
-              ? "clicked"
-              : ""
-          }
-        />
-        <div
-          id="blue"
-          onClick={this.onClick}
-          className={
-            !this.props.game.isTransitionEnded &&
-            this.props.game.buttonClicked === "blue"
-              ? "clicked"
-              : ""
-          }
-        />
-        <div
-          id="yellow"
-          onClick={this.onClick}
-          className={
-            !this.props.game.isTransitionEnded &&
-            this.props.game.buttonClicked === "yellow"
-              ? "clicked"
-              : ""
-          }
-        />
-        <div
-          id="green"
-          onClick={this.onClick}
-          className={
-            !this.props.game.isTransitionEnded &&
-            this.props.game.buttonClicked === "green"
-              ? "clicked"
-              : ""
-          }
-        />
-        <div id="menu" />
+      <div>
+        <div className="container" ref={this.containerRef}>
+          <div id="red" onClick={this.clickButton} />
+          <div id="yellow" onClick={this.clickButton}/>
+          <div id="blue" onClick={this.clickButton}/>
+          <div id="green" onClick={this.clickButton}/>
+          <div id="menu">
+            <button id="startGame" onClick={this.startGame}>
+              Start game
+            </button>
+            <p>{this.props.game.score}</p>
+          </div>
+        </div>
       </div>
     );
   }
 }
+
 const mapStateToProps = state => ({
-  settings: state.settings,
-  game: state.game
+  game: state
 });
 
-const mapDispatchToProps = {};
+// const mapDispatchToProps = {
+
+// }
 
 export default connect(mapStateToProps)(Game);
