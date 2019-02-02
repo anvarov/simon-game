@@ -9,6 +9,10 @@ export const startGame = {
 export const levelUp = {
   type: "LEVEL_UP"
 };
+
+export const reset = {
+  type: 'RESET'
+}
 //makeMove universal function, it can return different type of action by passing different
 //arguments
 export const makeMove = (e, isComputer = false, isUpdate = false) => {

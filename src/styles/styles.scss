@@ -1,5 +1,9 @@
 html {
+  font-family: "Press Start 2P", cursive;
   font-size: 16px;
+  width: 100%;
+  background-color: #ddffaa;
+  background-image: url("Repeating-Chevrons.svg");
 }
 
 .container {
@@ -8,14 +12,17 @@ html {
   grid-template-rows: 1fr 1fr 1fr 1fr;
   border-radius: 100%;
   left: 30%;
+  top: 10%;
+  width: 50 rem;
+  height: 50rem;
   position: absolute;
   z-index: -2;
   justify-items: center;
   -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
   -webkit-column-gap: 0%;
-          column-gap: 0%;
+  column-gap: 0%;
 }
 
 #menu {
@@ -27,6 +34,21 @@ html {
   grid-row: 2/4;
   z-index: 1;
 }
+
+#menu > button {
+  position: relative;
+  margin-top: 10%;
+  margin-left: 25%;
+}
+
+#menu > h1 {
+  margin-top: 30%;
+  margin-left: 10%;
+}
+
+#menu > p {
+  margin-left: 20%;
+}
 #red {
   height: 22rem;
   width: 22rem;
@@ -37,6 +59,24 @@ html {
   border: 2rem solid black;
   -webkit-transition: background-color 250ms;
   transition: background-color 250ms;
+}
+.modal {
+  margin: 15% auto;
+  width: 10rem;
+  height: 10rem;
+  position: relative;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 3px 3px 5px 6p rgba(0, 0, 0, 0.171);
+}
+.modal > button {
+  position: relative;
+  left: 1rem;
+  top: 2rem;
+  width: 8rem;
+  color: white;
+  background-color: blue;
+  box-shadow: 30rem white;
 }
 
 #red.clicked {

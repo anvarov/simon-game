@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
-import Dashboard from "./components/Dashboard.js";
+import Game from "./components/Game";
 import configuredStore from "./store/configureStore";
 import "./styles/normalize.css";
 import { Provider } from "react-redux";
@@ -11,7 +11,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Dashboard />
+        <Game />
       </Provider>
     );
   }

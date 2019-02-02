@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { levelUp, startGame, endGame, makeMove } from "../actions/game";
+import ReactModal from "react-modal";
+import { levelUp, startGame, endGame, makeMove, reset } from "../actions/game";
 import "../styles/normalize.css";
 import "../styles/styles.scss";
 
@@ -49,8 +50,11 @@ class Game extends Component {
     this.props.dispatch(startGame);
   };
 
+  closeModal = () => {
+    this.props.dispatch(reset);
+  };
   onClick = e => {
-    if (!this.props.game.gameStarted || this.props.game.gameEnded) return false
+    if (!this.props.game.gameStarted || this.props.game.gameEnded) return false;
     const clickedButton = e.target.id;
     clickedButton && playSound(clickedButton);
     e.target.className = "clicked";
@@ -82,7 +86,7 @@ class Game extends Component {
     //right after game start
     let clickedButton = COLORS[Math.floor(Math.random() * 4)];
     if (this.props.game.gameStarted && this.props.game.sequence.length === 0) {
-      console.log('from 1st conditional')
+      console.log("from 1st conditional");
       setTimeout(
         ctx => {
           playSound(clickedButton);
@@ -102,7 +106,7 @@ class Game extends Component {
       this.props.game.playerMoves === 0 &&
       this.props.game.sequence.length > this.props.game.computerMoves
     ) {
-      console.log('from 2nd conditional')
+      console.log("from 2nd conditional");
       setTimeout(
         ctx => {
           clickedButton = ctx.props.game.sequence[ctx.props.game.computerMoves];
@@ -125,7 +129,7 @@ class Game extends Component {
       this.props.game.level !== 1 &&
       this.props.game.sequence.length < this.props.game.level
     ) {
-      console.log('from 3th conditional')
+      console.log("from 3th conditional");
       setTimeout(
         ctx => {
           clickedButton = COLORS[Math.floor(Math.random() * 3)];
@@ -151,8 +155,20 @@ class Game extends Component {
   }
 
   render() {
+    ReactModal.setAppElement("#root");
     return (
       <div>
+        <ReactModal
+          contentLabel="Game Over"
+          className={"modal"}
+          overlayClassName={"overlay"}
+          onRequestClose={this.closeModal}
+          isOpen={this.props.game.gameEnded}
+        >
+          <p>Your score: {this.props.game.finalScore}</p>
+          <p>Levels: {this.props.game.finalLevel}</p>
+          <button onClick={this.closeModal}>Ok</button>
+        </ReactModal>
         <div className="container" ref={this.containerRef}>
           <audio src={sound1} id="sound1" />
           <div id="red" onClick={this.onClick} />
@@ -160,11 +176,12 @@ class Game extends Component {
           <div id="blue" onClick={this.onClick} />
           <div id="green" onClick={this.onClick} />
           <div id="menu">
+            <h1>Simon Game</h1>
+            <p>Score: {this.props.game.score}</p>
+            <p>Level: {this.props.game.level}</p>
             <button id="startGame" onClick={this.startGame}>
               Start game
             </button>
-            <p>{this.props.game.score}</p>
-            <p>{this.props.game.level}</p>
           </div>
         </div>
       </div>

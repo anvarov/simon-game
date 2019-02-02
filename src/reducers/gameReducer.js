@@ -9,6 +9,8 @@ const gameDefaultState = {
   playerMoves: 0,
   score: 0,
   isUpdate: false,
+  finalScore: 0,
+  finalLevel: 0,
 };
 
 export default (state = gameDefaultState, action) => {
@@ -22,8 +24,14 @@ export default (state = gameDefaultState, action) => {
     case "END_GAME":
       return {
         ...gameDefaultState,
-        gameEnded: true
+        gameEnded: true,
+        finalScore: state.score,
+        finalLevel: state.level
       };
+    case 'RESET':
+      return {
+        ...gameDefaultState
+      }
     case "MAKE_MOVE":
       return {
         ...state,
